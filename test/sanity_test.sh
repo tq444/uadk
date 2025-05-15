@@ -158,7 +158,7 @@ sw_blk_deflate()
 	case $3 in
 	"gzip")
 		${RM} -f /tmp/gzip_list.bin
-		python test/list_loader.py --in $1 --out $2 --olist /tmp/gzip_list.bin -b $4
+		python test/list_loader.py --in $1 --out $2 -b $4
 		;;
 	*)
 		echo "Unsupported algorithm type: $3"
@@ -172,7 +172,7 @@ sw_blk_inflate()
 {
 	case $3 in
 	"gzip")
-		python test/list_loader.py --in $1 --out $2 --ilist /tmp/gzip_list.bin
+		python test/list_loader.py --in $1 --out $2
 		;;
 	*)
 		echo "Unsupported algorithm type: $3"
