@@ -361,7 +361,7 @@ static int wd_agg_init_sess_priv(struct wd_agg_sess *sess, struct wd_agg_sess_se
 			WD_ERR("failed to get session uninit ops!\n");
 			return -WD_EINVAL;
 		}
-		ret = sess->ops.sess_init(setup, &sess->priv);
+		ret = sess->ops.sess_init(wd_agg_setting.driver, setup, &sess->priv);
 		if (ret) {
 			WD_ERR("failed to init session priv!\n");
 			return ret;
@@ -369,10 +369,10 @@ static int wd_agg_init_sess_priv(struct wd_agg_sess *sess, struct wd_agg_sess_se
 	}
 
 	if (sess->ops.get_row_size) {
-		ret = sess->ops.get_row_size(sess->priv);
+		ret = sess->ops.get_row_size(wd_agg_setting.driver, sess->priv);
 		if (ret <= 0) {
 			if (sess->ops.sess_uninit)
-				sess->ops.sess_uninit(sess->priv);
+				sess->ops.sess_uninit(wd_agg_setting.driver, sess->priv);
 			WD_ERR("failed to get hash table row size: %d!\n", ret);
 			return ret;
 		}
@@ -435,7 +435,7 @@ handle_t wd_agg_alloc_sess(struct wd_agg_sess_setup *setup)
 
 uninit_priv:
 	if (sess->ops.sess_uninit)
-		sess->ops.sess_uninit(sess->priv);
+		sess->ops.sess_uninit(wd_agg_setting.driver, sess->priv);
 err_sess:
 	if (sess->sched_key)
 		free(sess->sched_key);
@@ -457,7 +457,7 @@ void wd_agg_free_sess(handle_t h_sess)
 	free(sess->key_conf.data_size);
 
 	if (sess->ops.sess_uninit)
-		sess->ops.sess_uninit(sess->priv);
+		sess->ops.sess_uninit(wd_agg_setting.driver, sess->priv);
 	if (sess->sched_key)
 		free(sess->sched_key);
 
@@ -550,7 +550,7 @@ int wd_agg_set_hash_table(handle_t h_sess, struct wd_dae_hash_table *info)
 	memcpy(hash_table, info, sizeof(struct wd_dae_hash_table));
 
 	if (sess->ops.hash_table_init) {
-		ret = sess->ops.hash_table_init(hash_table, sess->priv);
+		ret = sess->ops.hash_table_init(wd_agg_setting.driver, hash_table, sess->priv);
 		if (ret) {
 			memcpy(hash_table, rehash_table, sizeof(struct wd_dae_hash_table));
 			memset(rehash_table, 0, sizeof(struct wd_dae_hash_table));
