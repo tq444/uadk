@@ -362,14 +362,13 @@ static void fill_hashagg_merge_output_order(struct dae_sqe *sqe, struct dae_ext_
 {
 	struct hashagg_ctx *agg_ctx = msg->priv;
 	struct hashagg_col_data *cols_data = &agg_ctx->cols_data;
-	struct hashagg_output_src *output_src = cols_data->normal_output;
-	__u32 out_cols_num = cols_data->output_num;
+	struct hashagg_output_src *output_src;
 	__u32 offset = 0;
 	__u32 i;
 
 	output_src = cols_data->rehash_output;
 
-	for (i = 0; i < out_cols_num; i++) {
+	for (i = 0; i < cols_data->output_num; i++) {
 		ext_sqe->out_from_in_idx |= (__u64)output_src[i].out_from_in_idx << offset;
 		ext_sqe->out_optype |= (__u64)output_src[i].out_optype << offset;
 		offset += DAE_COL_BIT_NUM;
@@ -625,8 +624,19 @@ static void fill_hashagg_info(struct dae_sqe *sqe, struct dae_ext_sqe *ext_sqe,
 
 static int check_hashagg_param(struct wd_agg_msg *msg)
 {
+	struct hashagg_col_data *cols_data;
+	struct hashagg_ctx *agg_ctx;
+
 	if (!msg) {
 		WD_ERR("invalid: input hashagg msg is NULL!\n");
+		return -WD_EINVAL;
+	}
+
+	agg_ctx = msg->priv;
+	cols_data = &agg_ctx->cols_data;
+	if (cols_data->output_num > DAE_MAX_OUTPUT_COLS) {
+		WD_ERR("invalid: input hashagg output num %u is more than %d!\n",
+			cols_data->output_num, DAE_MAX_OUTPUT_COLS);
 		return -WD_EINVAL;
 	}
 
