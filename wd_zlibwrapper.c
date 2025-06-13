@@ -86,7 +86,7 @@ static int wd_zlib_analy_alg(int windowbits, int *alg, int *windowsize)
 	static const int DEFLATE_MIN_WBITS = -15;
 	static const int WBINS_ZLIB_4K = 12;
 	static const int WBINS_GZIP_4K = 27;
-	static const int WBINS_DEFLATE_4K = -12;
+	static const int WBINS_DEFLATE_4K = 12;
 
 	if ((windowbits >= ZLIB_MIN_WBITS) && (windowbits <= ZLIB_MAX_WBITS)) {
 		*alg = WD_ZLIB;
@@ -96,6 +96,7 @@ static int wd_zlib_analy_alg(int windowbits, int *alg, int *windowsize)
 		*windowsize = max(windowbits - WBINS_GZIP_4K, WD_COMP_WS_4K);
 	} else if ((windowbits >= DEFLATE_MIN_WBITS) && (windowbits <= DEFLATE_MAX_WBITS)) {
 		*alg = WD_DEFLATE;
+		windowbits = -windowbits;
 		*windowsize = max(windowbits - WBINS_DEFLATE_4K, WD_COMP_WS_4K);
 	} else {
 		return Z_STREAM_ERROR;
