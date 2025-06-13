@@ -85,7 +85,7 @@ static int wd_zlib_analy_alg(int windowbits, int *alg, int *windowsize)
 	static const int DEFLATE_MAX_WBITS = -8;
 	static const int DEFLATE_MIN_WBITS = -15;
 	static const int WBINS_ZLIB_4K = 12;
-	static const int WBINS_GZIP_4K = 27;
+	static const int WBINS_GZIP_4K = 28;
 	static const int WBINS_DEFLATE_4K = 12;
 
 	if ((windowbits >= ZLIB_MIN_WBITS) && (windowbits <= ZLIB_MAX_WBITS)) {
@@ -120,7 +120,7 @@ static int wd_zlib_alloc_sess(z_streamp strm, int level, int windowbits, enum wd
 		return ret;
 	}
 
-	setup.comp_lv = level;
+	setup.comp_lv = level == Z_DEFAULT_COMPRESSION ? WD_COMP_L6 : level;
 	setup.alg_type = alg;
 	setup.win_sz = windowsize;
 	setup.op_type = type;
